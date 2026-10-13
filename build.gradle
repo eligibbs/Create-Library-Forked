@@ -5,6 +5,37 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.74'
 }
 
+group = 'petrolpark.mc.library' // Your group ID
+version = '1.5.11-eligibbs'     // Your library version
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = mod_group_id
+            artifactId = "${mod_id}-${minecraft_version}"
+            version = mod_version
+
+            // Explicitly include the main jar, sources jar, and javadoc jar
+            from components.java
+            // OR if components.java is still throwing errors, use:
+            // artifact jar
+            // artifact sourcesJar
+            // artifact javadocJar
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/eligibbs/Create-Library-Forked")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: findProperty("gpr.user")
+                password = System.getenv("GITHUB_TOKEN") ?: findProperty("gpr.key")
+            }
+        }
+    }
+}
+
 tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
@@ -105,6 +136,13 @@ repositories {
     maven { url = "https://maven.blamejared.com" } // JEI
     maven { url = "https://maven.theillusivec4.top/" } // Curios
     maven { url = "https://maven.teamresourceful.com/repository/maven-public/" } // Chipped
+    maven {
+        name = "CurseMaven"
+        url = "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
     exclusiveContent { // Destroy, Petrol's Parts, Supplementaries
         forRepository {
             maven {
@@ -123,10 +161,6 @@ repositories {
         filter {
             includeGroup("dev.ryanhcode.sable-companion")
         }
-    }
-    flatDir {
-        dirs "../petrolpark_local_maven/petrolpark/mc/pquality/pquality/${pquality_version}"
-        dirs "../petrolpark_local_maven/vectorwing/farmersdelight/FarmersDelight/${minecraft_version}-${farmers_delight_version}"
     }
 }
 
@@ -158,9 +192,9 @@ dependencies {
     // Jade
     implementation("maven.modrinth:jade:15.10.0+neoforge")
     // pquality
-    implementation("petrolpark.mc.pquality:pquality:${pquality_version}")
+    compileOnly("curse.maven:pquality-1186938:8947360")
     // Farmer's Delight
-    compileOnly("vectorwing.farmersdelight:FarmersDelight-${minecraft_version}:${farmers_delight_version}")
+    compileOnly("curse.maven:farmers-delight-398521:8765184")
 
     // TESTING ONLY
 
@@ -216,25 +250,6 @@ neoForge.ideSyncTask generateModMetadata
 java {
     withSourcesJar()
     withJavadocJar()
-}
-
-// Example configuration to allow publishing using the maven-publish plugin
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            groupId = mod_id // Not petrolpark.mc.library but just petrolpark
-            artifactId = "${mod_id}-${minecraft_version}" // Your mod's artifact ID
-        }
-    }
-
-    repositories {
-        maven {
-            name = 'localMaven'
-            url = uri("../petrolpark_local_maven") // Local repo directory
-        }
-    }
 }
 
 tasks.withType(JavaCompile).configureEach {
