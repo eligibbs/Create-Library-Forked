@@ -15,12 +15,7 @@ publishing {
             artifactId = "${mod_id}-${minecraft_version}"
             version = mod_version
 
-            // Explicitly include the main jar, sources jar, and javadoc jar
             from components.java
-            // OR if components.java is still throwing errors, use:
-            // artifact jar
-            // artifact sourcesJar
-            // artifact javadocJar
         }
     }
 
